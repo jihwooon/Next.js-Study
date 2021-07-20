@@ -53,7 +53,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
-node_modules
-.next
+node_modules/
+.next/
 yarn-error.log
 yarn.lock
