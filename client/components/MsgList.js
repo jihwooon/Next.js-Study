@@ -2,7 +2,7 @@ import {useEffect, useRef, useState} from 'react'
 import { useRouter} from "next/router";
 import MsgItem from "./MsgItem";
 import MsgInput from './MsgInput';
-import fetcher from '../fetcher';
+import queryClient from '../queryClient';
 import useInfiniteScroll from "../hooks/useInfiniteScroll";
 
 
@@ -17,13 +17,13 @@ const MsgList = ({smsgs, users}) => {
     const intersecting = useInfiniteScroll(fetchMoreEl)
 
     const onCreate = async text => {
-        const newMsg = await fetcher('post', '/messages',{text, userId })
+        const newMsg = await queryClient('post', '/messages',{text, userId })
        if(!newMsg) throw Error('something wrong')
         setMsgs(msgs => [newMsg, ...msgs])
     }
 
     const onUpdate = async (text,id) => {
-      const newMsg = await fetcher('put', `/messages/${id}`, {text, userId})
+      const newMsg = await queryClient('put', `/messages/${id}`, {text, userId})
        if(!newMsg) throw Error('something worng')
         setMsgs(msgs => {
             const targetIndex = msgs.findIndex(msg => msg.id === id)
@@ -36,7 +36,7 @@ const MsgList = ({smsgs, users}) => {
     }
 
     const onDelete = async id => {
-        const receivedId = await fetcher('delete', `/messages/${id}`, { params: {userId}})
+        const receivedId = await queryClient('delete', `/messages/${id}`, { params: {userId}})
         setMsgs(msgs => {
         const targetIndex = msgs.findIndex(msg => msg.id === receivedId + '')
         if(targetIndex < 0) return msgs
@@ -49,7 +49,7 @@ const MsgList = ({smsgs, users}) => {
     const doneEdit = () => setEditingId(null)
 
     const getMessages = async () => {
-        const newMsgs = await fetcher('get', '/messages', { params: { cursor:msgs[msgs.length - 1]?.id || ''}})
+        const newMsgs = await queryClient('get', '/messages', { params: { cursor:msgs[msgs.length - 1]?.id || ''}})
        if(newMsgs.length === 0) {
            setHasNext(false)
            return
